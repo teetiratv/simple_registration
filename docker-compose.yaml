@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  postgres-service:
+    image: postgres:alpine
+    networks:
+      - spring-boot-postgres-network
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=123456
+  registration-service:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - DB_URL=postgres-service
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=123456
+      - HIBERNATE_TYPE=create
+      - JWT_SECRET=mySecret
+      - JWT_EXPIRE_TIME=3600000
+    ports:
+      - "8080:8080"
+    networks:
+      - spring-boot-postgres-network
+    depends_on:
+      - postgres-service
+
+networks:
+  spring-boot-postgres-network:
+    driver: bridge
